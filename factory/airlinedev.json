@@ -1,0 +1,9 @@
+{
+	"name": "airlinedev",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "ffb21b70-1c61-4ee9-9434-eaee68f4b229",
+		"tenantId": "6e7b6c08-d89d-4a5c-a76c-72481153ae57"
+	}
+}
