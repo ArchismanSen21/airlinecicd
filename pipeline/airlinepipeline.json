@@ -1,6 +1,7 @@
 {
 	"name": "airlinepipeline",
 	"properties": {
+		"description": "Data Transformation",
 		"activities": [
 			{
 				"name": "Get Daily Flight File",
@@ -42,9 +43,92 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@activity('Get Daily Flight File').output.exists",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Response if file not found",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "FalseParam",
+								"value": {
+									"value": "@activity('Get Daily Flight File').output.exists",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Response if file found",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "TrueParam",
+								"value": {
+									"value": "@activity('Get Daily Flight File').output.exists",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "DataTransformation",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [
+								{
+									"activity": "Response if file found",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "AirlineDataTransformation",
+									"type": "DataFlowReference"
+								},
+								"compute": {
+									"coreCount": 16,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
 			}
 		],
+		"variables": {
+			"FalseParam": {
+				"type": "Boolean"
+			},
+			"TrueParam": {
+				"type": "Boolean"
+			}
+		},
 		"annotations": []
 	}
 }
